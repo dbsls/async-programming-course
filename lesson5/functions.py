@@ -1,3 +1,6 @@
+from gc import disable as gc_disable, enable as gc_enable
+
+
 def count_words(lines: list[str]):
     words = {}
     for line in lines:
@@ -30,4 +33,32 @@ def mp_count_words(lines: list[str], counter, lock):
 
     with lock:
         counter.value += len(lines)
+    return words
+
+
+def process_file_chunk(
+    file_name: str,
+    chunk_start: int,
+    chunk_end: int,
+    counter,
+    lock,
+) -> dict:
+    """Process each file chunk in a different process"""
+    diff = chunk_end - chunk_start
+    words = dict()
+    with open(file_name, mode="r") as f:
+        f.seek(chunk_start)
+        gc_disable()
+        for line in f:
+            chunk_start += len(line)
+            if chunk_start > chunk_end:
+                break
+            _word, _, match_count, _ = line.split("\t")
+            if _word in words:
+                words[_word] += int(match_count)
+            else:
+                words[_word] = int(match_count)
+        with lock:
+            counter.value += diff
+        gc_enable()
     return words
