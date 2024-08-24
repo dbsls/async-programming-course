@@ -1,0 +1,6 @@
+aiofiles
+asyncpg
+greenlet
+pydantic-settings
+pytz
+sqlalchemy
