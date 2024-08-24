@@ -33,6 +33,12 @@ This lesson focuses on asynchronous programming in Python. The main objective is
     cp app/.env.template app/.env
     ```
 
+5. **Run Alembic migrations:**
+    ```sh
+    cd app
+    alembic upgrade head
+    ```
+
 ## Running the Script
 
 1. **Run the main script:**
