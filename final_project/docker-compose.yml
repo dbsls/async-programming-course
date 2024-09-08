@@ -1,0 +1,63 @@
+x-env-file: &default-env-file
+  ./.env
+
+services:
+
+  cve_change_checker:
+    restart: no
+    build:
+      dockerfile: ./docker/cve_change_checker/Dockerfile
+      context: .
+    image: final_project.cve_change_checker:latest
+    depends_on:
+      - postgres
+      - cve_api
+    command: [ "uvicorn", "cve_change_checker.main:app", "--host", "0.0.0.0", "--port", "8081", "--reload", "--log-level", "debug" ]
+    networks:
+      - private-network
+    ports:
+      - "8081:8081"
+    env_file: *default-env-file
+    volumes:
+      - ./cve_change_checker:/cve_change_checker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  cve_api:
+    restart: no
+    build:
+      dockerfile: ./docker/cve_api/Dockerfile
+      context: .
+    image: final_project.cve_api:latest
+    depends_on:
+      - postgres
+    command: ["uvicorn", "cve_api.main:app", "--host", "0.0.0.0", "--port", "8080", "--reload", "--log-level", "debug"]
+    networks:
+      - private-network
+    ports:
+      - "8080:8080"
+    env_file: *default-env-file
+    volumes:
+      - ./cve_api:/cve_api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  postgres:
+    restart: no
+    image: postgres:16.1-alpine3.19
+    command: postgres -c log_statement=all
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+    networks:
+      - private-network
+    ports:
+      - "5436:5432"
+    env_file: *default-env-file
+
+
+volumes:
+  postgres-volume:
+
+networks:
+  private-network:
+    driver: bridge

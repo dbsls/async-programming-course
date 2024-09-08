@@ -61,4 +61,5 @@ venv/
 
 # Other
 tmp
-docker-compose.yml
+cvelistV5/
+
