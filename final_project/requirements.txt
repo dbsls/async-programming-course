@@ -1,0 +1,11 @@
+aiofiles
+asyncpg
+fastapi
+greenlet
+pydantic-settings
+pytz
+sqlalchemy
+uvicorn
+alembic
+jinja2
+aiohttp
