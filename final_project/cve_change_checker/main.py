@@ -20,16 +20,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(**{"lifespan": lifespan})
 templates = Jinja2Templates(directory="templates")
-semaphore = asyncio.Semaphore(get_settings().concurrent_requests)
-
-
-async def limit_concurrent_requests(request: Request, call_next):
-    async with semaphore:
-        response = await call_next(request)
-        return response
-
-
-app.middleware("http")(limit_concurrent_requests)
 
 
 @app.get("/download-cve")

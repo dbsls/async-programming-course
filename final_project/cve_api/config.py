@@ -3,6 +3,9 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
 
+    # Project settings
+    concurrent_requests: int = 8
+
     # Postgres settings
     postgres_user: str
     postgres_password: str

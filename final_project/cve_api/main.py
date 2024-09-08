@@ -1,15 +1,29 @@
+import asyncio
 from typing import Optional
 
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import date
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.requests import Request
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .schemas import CVE
 from .db import get_db
 from .crud import get_items_by_date_or_description, create_item, get_item
+from .config import get_settings
 
 
 app = FastAPI()
+
+semaphore = asyncio.Semaphore(get_settings().concurrent_requests)
+
+
+async def limit_concurrent_requests(request: Request, call_next):
+    async with semaphore:
+        response = await call_next(request)
+        return response
+
+
+app.middleware("http")(limit_concurrent_requests)
 
 
 @app.get("/items/{item_id}")

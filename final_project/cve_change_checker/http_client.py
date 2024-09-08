@@ -33,7 +33,7 @@ async def send_post_request(url, payload):
     async with ClientSession() as session:
         async with session.post(url, json=payload, headers={"Content-Type": "application/json"}) as response:
             print(f"Status Code: {response.status}")
-            response_content = await response.json()
+            response_content = await response.text()
             print(f"Response Content: {response_content}")
             return response_content
 
